@@ -1,0 +1,192 @@
+<div class="wrapper">
+    <div class="content">
+        <h1 class="welcome">PHP &amp; The Zend Engine &mdash; PHP Types</h1>
+
+<p>Types in PHP are defined in the Zend Engine in the <strong>Zend/zend.h</strong> header file. The header file contains the zval struct, which within that contains the zvalue_value union which holds the actual <em>variable data</em> and a <em>type identifier</em>.</p>
+
+<pre class="brush: c">typedef union _zvalue_value {
+    long lval;                  /* long value */
+    double dval;                /* double value */
+    struct {
+        char *val;
+        int len;
+    } str;
+    HashTable *ht;              /* hash table value */
+    zend_object_value obj;
+} zvalue_value;
+
+struct _zval_struct {
+    /* Variable information */
+    zvalue_value value;     /* value */
+    zend_uint refcount__gc;
+    zend_uchar type;    /* active type */
+    zend_uchar is_ref__gc;
+};</pre>
+
+<p>The <em>zvalue_value</em> union defines PHP's <strong>internal</strong> variable data types. Although integers and floats exist as types in PHP, they aren't actually stored as these types in variables. Instead, values are stored as:</p>
+<ul>
+<li>Booleans, bytes, shorts, and integers are stored as longs.</li>
+<li>Floats are stored as doubles.
+<li>Chars (including a single char) are stored as Strings.</li>
+<li>Resources have a long identifier which is used to identify the resource type.</li>
+<li>Arrays are actually HashTables.</li>
+</ul>
+
+<p>The <em>zend_object_value</em> is a special struct specifically for objects which will be covered in later posts.</p>
+
+<p>The <em>type</em> field stores a numeric representation of the type of the data which is stored. These types are defined in the same file:</p>
+
+<pre class="brush: c">/* data types */
+/* All data types <= IS_BOOL have their constructor/destructors skipped */
+#define IS_NULL     0
+#define IS_LONG     1
+#define IS_DOUBLE   2
+#define IS_BOOL     3
+#define IS_ARRAY    4
+#define IS_OBJECT   5
+#define IS_STRING   6
+#define IS_RESOURCE 7
+#define IS_CONSTANT 8
+#define IS_CONSTANT_ARRAY   9
+#define IS_CALLABLE 10</pre>
+
+<p>Now let's look into types a bit more; consider PHP's <a href="http://php.net/settype" title="" target="_blank">settype()</a> function. Consider the following <a href="http://lxr.php.net/xref/PHP_5_4/ext/standard/type.c#94" target="_blank">code in PHP's source code</a>,</p>
+<pre class="brush: c">/* \{{{ proto bool settype(mixed var, string type)
+   Set the type of the variable */
+PHP_FUNCTION(settype)
+{
+    zval **var;
+    char *type;
+    int type_len = 0;
+
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, &quot;Zs&quot;, &amp;var, &amp;type, &amp;type_len) == FAILURE) {
+        return;
+    }
+
+    if (!strcasecmp(type, &quot;integer&quot;)) {
+        convert_to_long(*var);
+    } else if (!strcasecmp(type, &quot;int&quot;)) {
+        convert_to_long(*var);
+    } else if (!strcasecmp(type, &quot;float&quot;)) {
+        convert_to_double(*var);
+    } else if (!strcasecmp(type, &quot;double&quot;)) { /* deprecated */
+        convert_to_double(*var);
+    } else if (!strcasecmp(type, &quot;string&quot;)) {
+        convert_to_string(*var);
+    } else if (!strcasecmp(type, &quot;array&quot;)) {
+        convert_to_array(*var);
+    } else if (!strcasecmp(type, &quot;object&quot;)) {
+        convert_to_object(*var);
+    } else if (!strcasecmp(type, &quot;bool&quot;)) {
+        convert_to_boolean(*var);
+    } else if (!strcasecmp(type, &quot;boolean&quot;)) {
+        convert_to_boolean(*var);
+    } else if (!strcasecmp(type, &quot;null&quot;)) {
+        convert_to_null(*var);
+    } else if (!strcasecmp(type, &quot;resource&quot;)) {
+        php_error_docref(NULL TSRMLS_CC, E_WARNING, &quot;Cannot convert to resource type&quot;);
+        RETURN_FALSE;
+    } else {
+        php_error_docref(NULL TSRMLS_CC, E_WARNING, &quot;Invalid type&quot;);
+        RETURN_FALSE;
+    }
+    RETVAL_TRUE;
+}
+/* }}} */</pre>
+<p>This is a simple function which takes a PHP variable (a <em>zval</em>, which is defined as a pointer to a pointer in the function) and a type value. The zval points to a PHP variable's pointer (its zval). The function calls another function to do the actual conversion and takes the dereferenced variable (which is now just a pointer). Subsequent conversions are handled by the Zend Engine.</p>
+
+<p>The simplest of the conversions is probably to the Boolean type, so that is the conversion which will be investigated. The function which does the conversion is <a href="http://lxr.php.net/xref/PHP_5_4/Zend/zend_operators.c#474" target="_blank">convert_to_boolean()</a>,</p>
+<pre class="brush: c">ZEND_API void convert_to_boolean(zval *op) /* \{{{ */
+{
+    int tmp;
+
+    switch (Z_TYPE_P(op)) {
+        case IS_BOOL:
+            break;
+        case IS_NULL:
+            Z_LVAL_P(op) = 0;
+            break;
+        case IS_RESOURCE: {
+                TSRMLS_FETCH();
+
+                zend_list_delete(Z_LVAL_P(op));
+            }
+            /* break missing intentionally */
+        case IS_LONG:
+            Z_LVAL_P(op) = (Z_LVAL_P(op) ? 1 : 0);
+            break;
+        case IS_DOUBLE:
+            Z_LVAL_P(op) = (Z_DVAL_P(op) ? 1 : 0);
+            break;
+        case IS_STRING:
+            {
+                char *strval = Z_STRVAL_P(op);
+
+                if (Z_STRLEN_P(op) == 0
+                    || (Z_STRLEN_P(op)==1 && Z_STRVAL_P(op)[0]=='0')) {
+                    Z_LVAL_P(op) = 0;
+                } else {
+                    Z_LVAL_P(op) = 1;
+                }
+                STR_FREE(strval);
+            }
+            break;
+        case IS_ARRAY:
+            tmp = (zend_hash_num_elements(Z_ARRVAL_P(op))?1:0);
+            zval_dtor(op);
+            Z_LVAL_P(op) = tmp;
+            break;
+        case IS_OBJECT:
+            {
+                zend_bool retval = 1;
+                TSRMLS_FETCH();
+
+                convert_object_to_type(op, IS_BOOL, convert_to_boolean);
+
+                if (Z_TYPE_P(op) == IS_BOOL) {
+                    return;
+                }
+
+                zval_dtor(op);
+                ZVAL_BOOL(op, retval);
+                break;
+            }
+        default:
+            zval_dtor(op);
+            Z_LVAL_P(op) = 0;
+            break;
+    }
+    Z_TYPE_P(op) = IS_BOOL;
+}
+/* }}} */</pre>
+<p>The switch statement accesses the zval's type. This allows the function to determine exactly which type it has in order to make the proper conversion. <em>Z_TYPE_P</em> can be simplified to,</p>
+<pre class="brush: c">#define Z_TYPE(zval)        (zval).type
+#define Z_TYPE_P(zval_p)    Z_TYPE(*zval_p)</pre>
+<p>This essentially dereferences the passed variable, passes the variable to <em>Z_TYPE</em>, then references the zval union's <em>type</em> record.</p>
+
+<p>Let's take a look at how each conversion is done in the switch statement. <em>Z_LVAL_P</em> accesses the zval union's <em>lval</em> record (which holds a long), and simply sets its value of either true or false. Because Booleans are stored as longs, these long values become the variable's new value.</p>
+<ul>
+<li><strong>Booleans</strong> - Are left alone because... That's the type that is being converted to.</li>
+<li><strong>Nulls</strong> - Are always converted to 0.</li>
+<li><strong>Resources</strong> - Are destroyed and then converted to a long.</li>
+<li><strong>Longs</strong> &amp; <strong>Doubles</strong> - Checks whether the numeric value results to true or false (ternary operation).</li>
+<li><strong>Strings</strong> - If the length of the first is 0 or the length is 1 and the character is a NUL, result to false. A regular string returns a 1. The original string is then freed/destroyed.</li>
+<li><strong>Arrays</strong> - If the length of the array is > 1, true, otherwise it is false. The array is then destroyed.</li>
+<li><strong>Objects</strong> - This is a more complicated conversion. If the object isn't able to cast itself, an error is thrown indicated it couldn't convert the object. If it can, a series of functions are called and the object is then converted to a Boolean true. The object is then destroyed.</li>
+<li><strong>Miscellanious</strong> - Any other type that gets converted to a Boolean will return a 0.</li>
+</ul>
+<p>Once the conversions are complete, the function sets its type record to <em>IS_BOOL</em>, which is a numeric constant for 3 (as seen above).</p>
+
+<p>The <em>refcount__gc</em> and <em>is_ref__gc</em> are used for garbage collection, and they are just used to store a count of references to this variable.</p>
+
+    </div>
+    <div class="push"></div>
+</div>
+
+<script type="text/javascript" src="/js/shCore.js"></script>
+<script type="text/javascript" src="/js/shBrushCpp.js"></script>
+<link href="/css/shCore.css" rel="stylesheet" type="text/css" />
+<link href="/css/shThemeDefault.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript">
+     SyntaxHighlighter.all();
+</script>

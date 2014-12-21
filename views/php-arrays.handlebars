@@ -1,0 +1,86 @@
+<div class="wrapper">
+    <div class="content">
+        <h1 class="welcome">PHP Native Array vs. SPL SplFixedArray vs. 'SPL Arraylist'</h1>
+
+    <p>This article will distinguish the differences between using PHP's standard 'array' and the SPL's SplFixedArray data structures.</p>
+
+    <p>PHP internally uses a HashTable for providing an assosciated array data structure. However, this can be quite an issue for developers who need the power of an array but require less memory overhead which comes as a consequence to PHP's default array structure. The <strong>Standard PHP Library (SPL)</strong> provides an alternative to PHP's default array implementation by providing a real array structure. This means PHP doesn't store the array as a HashTable internally but as a <a href="http://lxr.php.net/xref/PHP_5_4/ext/spl/spl_fixedarray.c#45" target="_blank">typical C array</a>. This benchmark will measure the total memory allocated by each element added to each array structure.</p>
+
+    <p>The code used to determine the benchmark is here:</p>
+
+    <pre class="brush: php">&lt;?php
+
+    define('ITERATIONS', 1000);
+
+    // Stage 1 - Native PHP array().
+    $array1 = array();
+    $memoryUsageInitial1 = memory_get_usage();
+
+    for ($counter = 0; $counter &lt; ITERATIONS; $counter++)
+        $array1[$counter] = null;
+
+    $memoryUsageFinal1 = memory_get_usage();
+    unset($array1);
+    // -----------------------------
+
+    // Stage 2 - Fixed size SplFixedArray object.
+    $array2 = new SplFixedArray(ITERATIONS);
+    $memoryUsageInitial2 = memory_get_usage();
+
+    for ($counter = 0; $counter &lt; ITERATIONS; $counter++)
+        $array2[$counter] = null;
+
+    $memoryUsageFinal2 = memory_get_usage();
+    unset($array2);
+    // -----------------------------
+
+    // Stage 3 - Dynamic SplFixedArray.
+    $array3 = new SplFixedArray(1);
+    $memoryUsageInitial3 = memory_get_usage();
+
+    for ($counter = 0; $counter &lt; ITERATIONS; $counter++) {
+        if ($array3-&gt;getSize() == $counter + 1) {
+            // Just as the Zend Engine does it with built-in arrays.
+            $array3-&gt;setSize($array3-&gt;getSize() &lt;&lt; 1);
+        }
+
+        $array3[$counter] = null;
+    }
+
+    $memoryUsageFinal3 = memory_get_usage();
+    unset($array3);
+    // -----------------------------
+
+    echo 'array():&lt;br /&gt;';
+    echo 'Initial: ' . $memoryUsageInitial1 . ' bytes&lt;br /&gt;';
+    echo 'Final: ' . $memoryUsageFinal1 . ' bytes&lt;br /&gt;';
+    echo 'Difference: ' . ($memoryUsageFinal1 - $memoryUsageInitial1) . ' bytes&lt;br /&gt;&lt;br /&gt;';
+
+    echo 'SplFixedArray (no resizing):&lt;br /&gt;';
+    echo 'Initial: ' . $memoryUsageInitial2 . ' bytes&lt;br /&gt;';
+    echo 'Final: ' . $memoryUsageFinal2 . ' bytes&lt;br /&gt;';
+    echo 'Difference: ' . ($memoryUsageFinal2 - $memoryUsageInitial2) . ' bytes&lt;br /&gt;&lt;br /&gt;';
+
+    echo 'SplFixedArray (with resizing):&lt;br /&gt;';
+    echo 'Initial: ' . $memoryUsageInitial3 . ' bytes&lt;br /&gt;';
+    echo 'Final: ' . $memoryUsageFinal3 . ' bytes&lt;br /&gt;';
+    echo 'Difference: ' . ($memoryUsageFinal3 - $memoryUsageInitial3) . ' bytes&lt;br /&gt;&lt;br /&gt;';
+
+?&gt;</pre>
+
+    <p>The results? Well by running the test it's clear that the SPL uses up MUCH less memory for almost every element size/iteration in the array. As the number of elements grow into the thousands and well into the tens of thousands, the SPL's performance is seen to outperform the native array structure. Also, using the SplFixedArray class as an arraylist is also much less of a memory hog than the native array and also provides dynamic resizing which is a great feature of the native implementation. However, note that dynamic resizing consumes a bit more memory due to unused elements spaces still having allocated memory.</p>
+
+    <p>Further readings on memory and performance:
+    <br /><a href="http://www.johnciacia.com/2011/02/01/array-vs-splfixedarray/" target="_blank">http://www.johnciacia.com/2011/02/01/array-vs-splfixedarray/</a>
+    <br /><a href="http://blog.shay.co/phps-native-array-vs-splfixedarray-performance/" target="_blank">http://blog.shay.co/phps-native-array-vs-splfixedarray-performance/</a>
+    </p></div>
+    <div class="push"></div>
+</div>
+
+<script type="text/javascript" src="/js/shCore.js"></script>
+<script type="text/javascript" src="/js/shBrushPhp.js"></script>
+<link href="/css/shCore.css" rel="stylesheet" type="text/css" />
+<link href="/css/shThemeDefault.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript">
+     SyntaxHighlighter.all();
+</script>

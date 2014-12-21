@@ -1,0 +1,166 @@
+<div class="wrapper">
+    <div class="content">
+        <h1 class="welcome">PHP &amp; The Zend Engine &mdash; PHP Arrays/HashTables</h1>
+
+<p>This blog post covers PHP's array data structure and the HashTable implementation.</p>
+
+<p>The Zend Engine reference can be found here,<br />
+<a href="http://anthony-calandra.com/wp/php-the-zend-engine-definitions-terms/">http://anthony-calandra.com/wp/php-the-zend-engine-definitions-terms/</a>.</p>
+
+<p>This reference quickly goes over previous concepts and introduces some information in particular on the HashTable and the Bucket.</p>
+
+<p>Let's take a look at PHP arrays in action. Consider a simple function <a href="http://www.php.net/manual/en/function.array-values.php">array_values()</a>, which returns all the values of the input array into a new array with numeric keys. The source code for this function can be found here,
+<a href="http://lxr.php.net/xref/PHP_5_4/ext/standard/array.c#2503">http://lxr.php.net/xref/PHP_5_4/ext/standard/array.c#2503</a></p>
+<pre class="brush: c">/* \{{{ proto array array_values(array input)
+   Return just the values from the input array */
+PHP_FUNCTION(array_values)
+{
+    zval     *input,        /* Input array */
+            **entry;        /* An entry in the input array */
+    HashPosition pos;
+
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, &quot;a&quot;, &amp;input) == FAILURE) {
+        return;
+    }
+
+    /* Initialize return array */
+    array_init_size(return_value, zend_hash_num_elements(Z_ARRVAL_P(input)));
+
+    /* Go through input array and add values to the return array */
+    zend_hash_internal_pointer_reset_ex(Z_ARRVAL_P(input), &amp;pos);
+    while (zend_hash_get_current_data_ex(Z_ARRVAL_P(input), (void **)&amp;entry, &amp;pos) == SUCCESS) {
+        zval_add_ref(entry);
+        zend_hash_next_index_insert(Z_ARRVAL_P(return_value), entry, sizeof(zval *), NULL);
+        zend_hash_move_forward_ex(Z_ARRVAL_P(input), &amp;pos);
+    }
+}
+/* }}} */</pre>
+<p>First, the input array is parsed by the function's parameters. Next, the array_init_size() function is called with the <em>return_value</em> variable and the input array's size (in elements). However, notice the return_value isn't defined anywhere in the function. Curious to know where it comes from? Keep reading, otherwise, skip past the next sub-section.</p>
+
+<hr />
+
+<p><strong><span style="text-decoration: underline;">Where does the return_value variable come from?</span></strong>
+Notice the <em>PHP_FUNCTION</em> macro definition? Check out <strong>php.h</strong> where you will find,</p>
+<pre class="brush: c">#define PHP_FUNCTION            ZEND_FUNCTION</pre>
+<p>The definition of the <em>ZEND_FUNCTION</em> macro can be found in <strong>zend_API.h</strong>. Proceeding down to line 67 and 68 reveals,</p>
+<pre class="brush: c">#define ZEND_NAMED_FUNCTION(name)       void name(INTERNAL_FUNCTION_PARAMETERS)
+#define ZEND_FUNCTION(name)             ZEND_NAMED_FUNCTION(ZEND_FN(name))</pre>
+<p>With <em>INTERNAL_FUNCTION_PARAMETERS</em> in <strong>zend.h</strong> defining,</p>
+<pre class="brush: c">#define INTERNAL_FUNCTION_PARAMETERS int ht, zval *return_value, zval **return_value_ptr, zval *this_ptr, int return_value_used TSRMLS_DC</pre>
+<p>Therefore, the <em>return_value</em> variable is actually a zval pointer.</p>
+
+<hr />
+
+<p><em>array_init_size</em> is a macro which is actually the <em>_array_init()</em> function in disguise. :)</p>
+<pre class="brush: c">/* Argument parsing API -- andrei */
+ZEND_API int _array_init(zval *arg, uint size ZEND_FILE_LINE_DC) /* \{{{ */
+{
+    ALLOC_HASHTABLE_REL(Z_ARRVAL_P(arg));
+
+    _zend_hash_init(Z_ARRVAL_P(arg), size, NULL, ZVAL_PTR_DTOR, 0 ZEND_FILE_LINE_RELAY_CC);
+    Z_TYPE_P(arg) = IS_ARRAY;
+    return SUCCESS;
+}
+/* }}} */</pre>
+<p>Okay, so let's take a step to the side for a bit and investigate this underlying HashTable implementation. This function is basically the mechanism which initializes arrays in PHP. For example, when setting a value as an array in PHP,</p>
+<pre class="brush: php">&lt;?php
+    $arr = array();
+?&gt;</pre>
+<p>The <em>arr</em> variable's zval becomes a HashTable and its numeric type changes to <em>IS_ARRAY</em>.</p>
+
+<strong><span style="text-decoration: underline;">The HashTable</span></strong>
+
+<p>PHP's HashTable implementation utilizes <a href="http://en.wikipedia.org/wiki/Hash_table#Separate_chaining_with_linked_lists" target="_blank">seperate chaining</a> using linked lists, or "bucket chains." The bucket structure has a pointer to subsequent or previous buckets which are traversed if the bucket at the index selected is not null. </p>
+
+<p>When an array key creates a hash in a hashtable that is the same as another key's hash, the collided hash is stored in a subsequent reference to the current bucket (hence its "linked" properties). However, a hash collision isn't the primary factor which determines the data to be located in the HashTable. The hash <em>hints</em> at where the data is available, and another possibility for more than one piece of data to be stored is with the same computed index. For example, if a given hash computes an index, and another hash with seperate data computes the same index, the data is stored in the bucket's linked list as a result of a "collided index."</p>
+
+<p>This can be shown using some code available online <a href="http://codepad.org/Ih7OZr9k" target="_blank">here</a> or to download <a href="http://anthony-calandra.com/wp/wp-content/uploads/2013/02/example.c" target="_blank">here</a>.</p>
+
+<p>The following image (taken from the Wikipedia page) outlines what seperate chaining looks like:</p>
+
+<br />
+<img alt="" src="http://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/Hash_table_5_0_1_1_1_1_1_LL.svg/450px-Hash_table_5_0_1_1_1_1_1_LL.svg.png" />
+
+<p>Imagine the names of people as pData and the telephone numbers as pDataPtr.</p>
+
+<p>An illustration of this idea in the Zend Engine is when searching for a piece of data in a HashTable. The <em>zend_hash_find()</em> is such a function.</p>
+
+<pre class="brush: c">/* Returns SUCCESS if found and FAILURE if not. The pointer to the
+ * data is returned in pData. The reason is that there's no reason
+ * someone using the hash table might not want to have NULL data
+ */
+ZEND_API int zend_hash_find(const HashTable *ht, const char *arKey, uint nKeyLength, void **pData)
+{
+    ulong h;
+    uint nIndex;
+    Bucket *p;
+
+    IS_CONSISTENT(ht);
+
+    h = zend_inline_hash_func(arKey, nKeyLength);
+    nIndex = h &amp; ht-&gt;nTableMask;
+
+    p = ht-&gt;arBuckets[nIndex];
+    while (p != NULL) {
+        if (p-&gt;arKey == arKey ||
+            ((p-&gt;h == h) &amp;&amp; (p-&gt;nKeyLength == nKeyLength) &amp;&amp; !memcmp(p-&gt;arKey, arKey, nKeyLength))) {
+                *pData = p-&gt;pData;
+                return SUCCESS;
+        }
+        p = p-&gt;pNext;
+    }
+    return FAILURE;
+}
+</pre>
+
+<p>Step by step, the following processes occur:</p>
+<ul>
+<li>The hash is computed using the given array key and the key length. Subsequently, the index is calculated by applying the hash to the table mask (table size minus 1) as usual. The index is stored as <strong>nIndex</strong>.</li>
+<li>The array of buckets in the HashTable are accessed and the bucket at nIndex is returned and stored in the <strong>p</strong> variable.</li>
+<li>If p is null then there is no data stored and the function fails. If p is not null, a while loop traverses the list by resetting p to the next bucket in the linked list.</li>
+<li>Once the array key is found or the hash and key value/length are found (for keys with collisions), the function is successful.</li>
+</ul>
+
+<p>Therefore, the function fails if the bucket is null or if all of the buckets in the linked list/bucket chain don't contain the requested data.</p>
+
+<strong><span style="text-decoration: underline;">Arrays continued...</span></strong>
+
+<p>Back to the array_values() function, it is clear that the rest of the code is very <strong>similar</strong> to a loop in PHP which traverses an array.</p>
+
+<pre class="brush: c">    /* Go through input array and add values to the return array */
+    zend_hash_internal_pointer_reset_ex(Z_ARRVAL_P(input), &amp;pos);
+    while (zend_hash_get_current_data_ex(Z_ARRVAL_P(input), (void **)&amp;entry, &amp;pos) == SUCCESS) {
+        zval_add_ref(entry);
+        zend_hash_next_index_insert(Z_ARRVAL_P(return_value), entry, sizeof(zval *), NULL);
+        zend_hash_move_forward_ex(Z_ARRVAL_P(input), &amp;pos);
+    }</pre>
+
+<p>And,</p>
+
+<pre class="brush: php">&lt;?php
+
+reset($array);
+// However, boolean false values can not be distinguished!
+while (($entry = current($array)) !== false) {
+   $array[] = $entry;
+   next($array);
+}
+
+?&gt;</pre>
+
+<p>Because array_values() returns the array with numeric keys, <em>zend_hash_next_index_insert()</em> as the name implies uses the HashTable's <em>nNextFreeElement</em> record to identify the next available hash value.</p>
+
+
+<p>This concludes the post! Thanks for reading.</p>
+    </div>
+    <div class="push"></div>
+</div>
+
+<script type="text/javascript" src="/js/shCore.js"></script>
+<script type="text/javascript" src="/js/shBrushPhp.js"></script>
+<script type="text/javascript" src="/js/shBrushCpp.js"></script>
+<link href="/css/shCore.css" rel="stylesheet" type="text/css" />
+<link href="/css/shThemeDefault.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript">
+     SyntaxHighlighter.all();
+</script>

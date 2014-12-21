@@ -1,0 +1,12 @@
+{
+  "name": "anthony-calandra.com",
+  "version": "1.0.0",
+  "description": "Website files for anthony-calandra.com.",
+  "main": "index.js",
+  "author": "Anthony Calandra <anthony@anthony-calandra.com>",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.10.6",
+    "express-handlebars": "^1.1.0"
+  }
+}

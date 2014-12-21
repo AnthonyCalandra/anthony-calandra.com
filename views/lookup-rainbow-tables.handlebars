@@ -1,0 +1,53 @@
+<div class="wrapper">
+    <div class="content">
+        <h1 class="welcome">How Lookup and Rainbow Tables work</h1>
+
+<h2><span style="text-decoration: underline;"><strong>Introduction</strong></span></h2>
+<p>Sensitive data is stored as <em>hashes</em> in the database or file with hashing algorithms such as MD5 or SHA-2 hashing the value of the original password (or what is called the <em>plaintext</em>). Take the password <em>anthony123 </em>for example. Hashing it with MD5 and SHA-2 outputs:</p>
+<blockquote>MD5: anthony123 =&gt; 72f99c7aa7eb9860ca506a67d0845688<br />
+SHA-2: anthony123 =&gt; 708b03176702e0295a5b6126f51472ef0aac8a1e</blockquote>
+<p>Two different hashes are produced, and there is no way to decrypt these hashes since the a hash is one-way encryption of a value. This means that there is no algorithm that can reverse a hash.</p>
+
+<p>This is what is stored in a database/file, so putting this in the context of a login system: a user wants to login, and so enters his/her password in the script and submits the data. The original value is hashed using the same hashing function(s) that was done during registration to store the password. This newly hashed password is then checked against the hashed password in the database. If there is a match, the user has successfully logged in!</p>
+
+<h2><span style="text-decoration: underline;"><strong>Lookup Tables</strong></span></h2>
+
+<p>These are much simpler in their use for determining the original value of a hash, because for every hash there is a plaintext value associated with it. Imagine a table with a hash in one column, and a plaintext value in the second column. The table below would represent a hash and its associated password.</p>
+
+<a href="http://anthony-calandra.com/wp/wp-content/uploads/2012/06/lookup_table_ex1.png"><img class="aligncenter size-full wp-image-237" title="lookup_table_ex1" src="http://anthony-calandra.com/wp/wp-content/uploads/2012/06/lookup_table_ex1.png" alt="" width="251" height="259" /></a><br />
+
+<p>Lookup tables can also be thought of simple lists. An array is an example of a simple lookup table (<em>h</em> being the variable)!</p>
+
+<h2><span style="text-decoration: underline;"><strong>Rainbow Tables</strong></span></h2>
+
+<p>I want to go over Rainbow Tables briefly so you get an idea of what these are. A rainbow table stores the hash of commonly used words and combinations. For example, a word as part of a phrase has a hash value associated with it, which is stored for later use in a rainbow table. This is done by the table's <em>reduction functions</em>. In contrast to a lookup table, a rainbow table will store parts of rather than whole hashes, and use a series of <em>chains</em> to reach the plaintext value.</p>
+
+<p>A <em>reduction function</em> simply returns a usable plaintext value from a hash. An example of a reduction function can be seen as follows, with <strong>H()</strong> representing a hash function (in this case, it will be MD5), <strong>R()</strong> the reduction function, <strong>p </strong>the plaintext, <strong>h</strong> the hashed value:</p>
+<blockquote>h1 = H('anthony123') = 72f99c7aa7eb9860ca506a67d0845688<br />
+r1 = R(h1) = 72f99c7aa7eb9860</blockquote>
+<p>In the above example, you can see the reduction value from the hash is 72f99c7aa7eb9860. Take a close look at the MD5 hash produced, and you will (hopefully!) notice it's the same as the first half of the hash. A reduction function just compresses the hash into a usable plaintext value. A rainbow table will possibly have many different reduction functions.</p>
+
+<p>The <em>chains</em> in a rainbow table are the series of hash and reduction functions made on a plaintext to result in a final hash. This is placed in a lookup table which is used to initialize the rainbow table. The plaintext is in the left column (or at the beginning of the chain), and the final hash is in the right column (end of chain).</p>
+
+<p>I really enjoyed the example rainbow table provided by <a href="http://stichintime.wordpress.com/2009/04/09/rainbow-tables-part-5-chains-and-rainbow-tables/">this blog</a>, so I will use it for our purposes. In this rainbow table, the hash function takes a two-digit plaintext value and hashes it into four digits. The reduction function simply two digits of the hash (this is denoted by the red underline in the below picture of the rainbow table).</p>
+
+<p>So, let's see if we can find the plaintext of the hash: <strong>5520</strong>.
+<p>Here's a break down of what's going on:</p>
+<ol>
+  <li>The hash (<strong>5520</strong>) is looked up in the rainbow table's lookup table, on the left side of the chain, we find the plaintext value of <strong>68</strong>.</li>
+  <li>The plaintext value (p1) is then hashed using the hash function. Does it match the original? No.</li>
+  <li>Now reduce into another plaintext value (p2). The reduction function here takes the last two digits of the hash. This creates the first part of the chain.</li>
+  <li>p2 is then hashed again, and this time, does the hash match the original hash? Since <strong>3790</strong> is not <strong>5520</strong>, <strong>31</strong> is NOT the original plaintext, so move on and reduce the hash again (this reduction function takes the first two digits). This creates another chain.</li>
+  <li>p3 is then hashed (h3) and now we check again to see if its hashed value matches our original hash. It does! This means the plaintext <strong>32</strong> is what <strong>5520</strong> is the hash of. Therefore, <strong>5520</strong> decrypts to <strong>37</strong>.</li>
+</ol>
+<p>Okay, so what happens if the original hash isn't in the lookup table? Let's say we start with the hash: <strong>3955</strong>. This means a little extra work is required:</p>
+<ol>
+  <li>Since the hash isn't in the original lookup table, we need to step backwards in the rainbow table. So start with the last reduction function in the table by reducing the hash to a plaintext of <strong>39</strong>.</li>
+  <li>Hash that plaintext value to obtain a hash that isn't found in the lookup table. Now check again, using the next reduction function on <strong>3955</strong> which outputs a plaintext of <strong>55</strong>. Hey, it's in the rainbow table!</li>
+  <li>Now we continue as usual, by hashing it to get <strong>4532 </strong>(which isn't found in the lookup table) and reducing it to <strong>45</strong>.</li>
+  <li>Hash it again to receive an output of <strong>3708</strong> and check the lookup table again. We manage to find its plaintext match of <strong>03</strong>.</li>
+  <li>Begin the entire process from the beginning again. <strong>03</strong> hashes into <strong>3955</strong>, so does it match the original? Yes! This means that the hash <strong>3955</strong> decrypts to the plaintext value of <strong>03</strong>!</li>
+</ol>
+    </div>
+    <div class="push"></div>
+</div>

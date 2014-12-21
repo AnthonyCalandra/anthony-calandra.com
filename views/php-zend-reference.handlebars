@@ -1,0 +1,89 @@
+<div class="wrapper">
+    <div class="content">
+        <h1 class="welcome">PHP &amp; The Zend Engine &mdash; Reference</h1>
+
+<p>Link to the PHP source code: <a href="http://lxr.php.net/xref/" title="http://lxr.php.net/xref/" target="_blank">http://lxr.php.net/xref/</a></p>
+
+<p><strong>zend value/zval</strong> - A struct (<em>_zval_struct</em>) containing information about a variable. A zval is essentially a variable in PHP.</p>
+
+<p><strong>zval value</strong> - A union (<em>zvalue_value</em>) which holds the value of a zval (according to its value's type). These values include: a double, long, zend object, HashTable, and string. This proves types such as resources, integers, and booleans are all represented as longs.</p>
+
+<p><strong>zend object</strong> - PHP's internal storage of a class contained in a struct (<em>zend_object</em>) which contains a table of the class' properties and a <em>zend_class_entry</em> type.</p>
+
+<p><strong>zend class entry</strong> - The underlying struct (<em>zend_class_entry</em>) in a zend object struct which contains several records of information some of which including:</p>
+<ul>
+  <li>Name of the class.</li>
+  <li>Class entries, to its parent, implemented interfaces, and traits.</li>
+  <li>A reference count.</li>
+  <li>Hashtables of functions, properties, and constants (including all static properties).</li>
+  <li>Function pointers to magic methods, constructor, destructor, and serialization methods.</li>
+</ul>
+<p>When the class entry is created for a defined PHP class, the <em>_object_and_properties_init()</em> function handles the construction of the entry object.</p>
+
+<p><strong>HashTable</strong> - The HashTable type is a typical HashTable implementation. The HashTable uses the <a href="http://lxr.php.net/xref/PHP_TRUNK/Zend/zend_hash.h#228">DJBX33A</a> hash function. </p>
+<pre class="brush: c">typedef struct _hashtable {
+    uint nTableSize;
+    uint nTableMask;
+    uint nNumOfElements;
+    ulong nNextFreeElement;
+    Bucket *pInternalPointer;   /* Used for element traversal */
+    Bucket *pListHead;
+    Bucket *pListTail;
+    Bucket **arBuckets;
+    dtor_func_t pDestructor;
+    zend_bool persistent;
+    unsigned char nApplyCount;
+    zend_bool bApplyProtection;
+#if ZEND_DEBUG
+    int inconsistent;
+#endif
+} HashTable;</pre>
+<p>Some information about the struct:</p>
+<ul>
+  <li><em>nTableSize</em> - The table size is the number of memory space allocated for the requested size. The number of available memory space is calculated by checking if 2^i (i=3 initially) is larger than the requested size. If it is not, i is incremented and the check is made again until it is larger than the requested value. Overflow is handled as well.
+<pre class="brush: c">if (nSize &gt;= 0x80000000) {
+    /* prevent overflow */
+    ht-&gt;nTableSize = 0x80000000;
+} else {
+    while ((1U &lt;&lt; i) &lt; nSize) {
+        i++;
+    }
+    ht-&gt;nTableSize = 1 &lt;&lt; i;
+}</pre></li>
+  <li><em>nTableMask</em> - This is the table's size in elements (which is <em>nNumOfElements</em>) minus one. The index of a particular value is computed by inputting the array key into the hash function then applying a bitwise AND with the nTableMask.
+<pre class="brush: c">nIndex = hashedKey &amp; h->nTableMask;</pre></li>
+  <li><em>pInternalPointer</em> - The internal pointer of the current element used in element traversals (loops and so on).</li>
+  <li><em>arBuckets</em> - The internal list of elements or "Buckets". arBuckets is a pointer to an array of pointers. Each element in this array is a pointer to a Bucket.</li>
+  <li><em>pDestructor</em> - A function pointer to the HashTable's destructor function when values are removed from the table.</li>
+</ul>
+<p><strong>Bucket</strong> - A Bucket is a data type which is a linked list of data that have the same index/hash that was computed by the hash function and table mask. It is an abstract container. </p>
+<pre class="brush: c">typedef struct bucket {
+    ulong h;                        /* Used for numeric indexing */
+    uint nKeyLength;
+    void *pData;
+    void *pDataPtr;
+    struct bucket *pListNext;
+    struct bucket *pListLast;
+    struct bucket *pNext;
+    struct bucket *pLast;
+    const char *arKey;
+} Bucket;</pre>
+<p>Some information on the Bucket:</p>
+<ul>
+  <li><em>h</em> - The Bucket's hash value. This is used when traversing the HashTable while searching for a Bucket's value/existence.</li>
+  <li><em>nKeyLength</em> and <em>arKey</em> - Are both used as the "key value" for non-numeric indices.</li>
+  <li><em>pData</em> and <em>pDataPtr</em> - Both the pointer to the data in the Bucket and its pointer (the pointer's pointer).</li>
+  <li>Pointers to the next/previous, and first/last Buckets in the linked list of overflowed entries in the Bucket. This means that values which have the same hash value/index get placed in a linked list.</li>
+</ul>
+
+    </div>
+    <div class="push"></div>
+</div>
+
+<script type="text/javascript" src="/js/shCore.js"></script>
+<script type="text/javascript" src="/js/shBrushCpp.js"></script>
+<link href="/css/shCore.css" rel="stylesheet" type="text/css" />
+<link href="/css/shThemeDefault.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript">
+     SyntaxHighlighter.all();
+</script>
