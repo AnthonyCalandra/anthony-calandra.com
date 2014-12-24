@@ -32,6 +32,7 @@ app.use(function(err, req, res, next) {
 });
 
 app.listen(app.get('port'), function() {
-  console.log('Express started on localhost:' + app.get('port'));
+  console.log('Express started in ' + app.get('env') +
+    ' mode on localhost:' + app.get('port'));
   console.log('Press Ctrl-C to terminate.');
 });
