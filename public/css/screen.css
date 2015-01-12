@@ -17,40 +17,32 @@ html, body {
 }
 
 header {
-    background: #202122;
-    height: 75px;
-    width: 100%;
-    box-shadow:0 0 15px rgba(0,0,0,0.3);
-    border-bottom: 3px solid #3d84fe;
-}
-
-.content {
-    background: #fff;
-    min-height: 100%;
-    padding: 20px;
-    box-shadow:0 0 15px rgba(0,0,0,0.1);
-    border-right: 1px solid #d0d0d0;
+  background: #202122;
+  height: 75px;
+  width: 100%;
+  box-shadow:0 0 15px rgba(0,0,0,0.3);
+  border-bottom: 3px solid #3d84fe;
 }
 
 .wrapper {
   float: left;
-  height: 100%;
+  min-height: 100%;
   width: 70%;
+  background: #fff;
+  box-shadow:0 0 15px rgba(0,0,0,0.1);
+  border-right: 1px solid #d0d0d0;
+  padding: 0px 10px 0px 10px;
 }
 
 footer {
-    background: #202122;
-    height: 75px;
-    border-top: 3px solid #3d84fe;
-    box-shadow:0 0 15px rgba(0,0,0,0.3);
-}
-
-.footer-inside {
-    height: 75px;
-    width: 980px;
-    line-height: 75px;
-    margin: 0 auto auto auto;
-    text-align: center;
+  clear: both;
+  background: #202122;
+  height: 75px;
+  border-top: 3px solid #3d84fe;
+  box-shadow:0 0 15px rgba(0,0,0,0.3);
+  text-align: center;
+  color: #fff;
+  line-height: 75px;
 }
 
 .branding {
@@ -110,7 +102,7 @@ p {
     padding: 10px;
 }
 
-h1.welcome {
+h1, h2, h3 {
     border-bottom: 3px solid #3d84fe;
     padding-bottom: 10px;
 }
