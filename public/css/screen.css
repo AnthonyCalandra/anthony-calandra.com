@@ -85,7 +85,7 @@ h1 {
 }
 
 .home p {
-  font-size: 18px;
+  font-size: 21px;
   text-align: center;
 }
 
@@ -102,7 +102,7 @@ p {
     padding: 10px;
 }
 
-h1, h2, h3 {
+h1:not(.no-underline), h2:not(.no-underline), h3:not(.no-underline) {
     border-bottom: 3px solid #3d84fe;
     padding-bottom: 10px;
 }
