@@ -1,7 +1,52 @@
-<div class="left home">
-  <h1 class="no-underline">Hello!</h1>
-  <p>My name is Anthony Calandra and I'm a second-year student studying computer science (co-op) at the University of Waterloo.</p>
-  <p>I am passionate about open-source and the open-source community is where you can find most of my written software.</p>
-  <p>My focus is the web mainly as a back-end web developer but I also enjoy doing front-end work such as simple designs and dynamic HTML.</p>
-  <p>I also have strong interests in operating systems and embedded systems which I hope to expand on in the future.</p>
-</div>
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{{siteTitle}}</title>
+    <link rel="stylesheet" type="text/css" href="/css/screen.css" />
+    <link href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet" />
+  </head>
+  <body>
+    <div id="home-panel">
+      <main>
+        <h1 class="no-underline">Welcome.</h1>
+        <nav>
+          <ul id="nav-list">
+            <li><a href="/posts"><span data-label="Posts &amp; Articles" class="fa fa-pencil navi-icon fa-4x"></span></a></li>
+            <li><a href="http://github.com/AnthonyCalandra"><span data-label="Github Profile" class="fa fa-github navi-icon fa-4x"></span></a></li>
+            <li><a href="http://stackoverflow.com/users/3229983/anthony-calandra"><span data-label="Stack Overflow Profile" class="fa fa-stack-overflow navi-icon fa-4x"></span></a></li>
+            <li><a href="/downloads/AnthonyCalandra_Resume.pdf"><span data-label="Resume" class="fa fa-paperclip navi-icon fa-4x"></span></a></li>
+          </ul>
+        </nav>
+        <span id="nav-label"></span>
+      </main>
+    </div>
+    <footer>
+      <span>
+        {{#if loggedIn}}
+          <a href="/logout?_csrf={{csrfToken}}" class="brand">Logout</a> - <a href="/create" class="brand">Create Post</a>
+          {{#if inPost}}
+          - <a href="/edit/{{postId}}" class="brand">Edit Post</a> - <a href="/delete/{{postId}}" class="brand">Delete Post</a>
+          {{/if}}
+        {{else}}
+          <a href="/login" class="brand">Login</a>
+        {{/if}}
+         - <a href="/posts" class="brand">Posts Index</a>
+      </span>
+    </footer>
+    {{{footerHtml}}}
+    <script style="text/javascript">
+      document.getElementById('nav-list').addEventListener('mouseover', function(e) {
+        // Make sure the user is actually hovering over the anchor/icon.
+        if (e.target && e.target.nodeName === 'SPAN') {
+          document.getElementById('nav-label').textContent = e.target.dataset.label;
+          document.getElementById('nav-label').style.opacity = '1';
+        }
+      });
+      document.getElementById('nav-list').addEventListener('mouseout', function(e) {
+        document.getElementById('nav-label').style.opacity = '0';
+      });
+    </script>
+  </body>
+</html>

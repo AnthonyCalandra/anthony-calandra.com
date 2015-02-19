@@ -1,3 +1,69 @@
+@media screen and (max-width: 600px) {
+  .right {
+      width: 100%;
+  }
+
+  .wrapper {
+    min-height: 100%;
+    width: 100%;
+    background: #fff;
+    box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    border-top: 1px solid #d0d0d0;
+  }
+
+  ul.menu {
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+    text-align: center;
+  }
+
+  ul.menu li a span.label {
+    display: none;
+  }
+
+  ul.menu li {
+    display: inline-block;
+    padding: 10px;
+  }
+}
+
+@media all and (min-width: 600px) {
+  .clear {
+      clear: both;
+  }
+
+  .right {
+      float: right;
+      width: 25%;
+  }
+
+  .wrapper {
+    float: left;
+    min-height: 100%;
+    width: 70%;
+    background: #fff;
+    box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    border-right: 1px solid #d0d0d0;
+  }
+
+  ul.menu {
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+  }
+
+  ul.menu li a span.label {
+    font-size: 14pt;
+  }
+
+  ul.menu li {
+    display: block;
+    padding: 15px;
+    width: auto;
+  }
+}
+
 @font-face {
   font-family: 'Open Sans';
   font-style: normal;
@@ -24,14 +90,38 @@ header {
   border-bottom: 3px solid #3d84fe;
 }
 
-.wrapper {
-  float: left;
+#home-panel {
+  text-align: center;
   min-height: 100%;
-  width: 70%;
-  background: #fff;
-  box-shadow:0 0 15px rgba(0,0,0,0.1);
-  border-right: 1px solid #d0d0d0;
-  padding: 0px 10px 0px 10px;
+}
+
+#home-panel main {
+  padding-top: 15%;
+}
+
+#home-panel h1 {
+  font-size: 50pt;
+}
+
+#home-panel nav ul {
+  list-style: outside none none;
+}
+
+#home-panel nav ul li {
+  display: inline-block;
+  padding: 10px;
+}
+
+#nav-label {
+  font-weight: bold;
+  padding-right: 15px;
+  opacity: 0;
+  transition: opacity 1s;
+}
+
+#home-panel ul li a {
+  text-align: center;
+  margin: auto;
 }
 
 footer {
@@ -42,12 +132,20 @@ footer {
   box-shadow:0 0 15px rgba(0,0,0,0.3);
   text-align: center;
   color: #fff;
-  line-height: 75px;
+}
+
+footer span {
+  position: relative;
+  top: 40%;
+}
+
+.wrapper main {
+  padding: 0px 10px 0px 10px;
 }
 
 .branding {
     height: 75px;
-    width: 980px;
+    width: 100%;
     text-align: left;
     line-height: 75px;
     margin: 0 auto auto auto;
@@ -57,20 +155,6 @@ footer {
 a.brand {
     color: #fff;
     text-decoration: none;
-}
-
-.clear {
-    clear: both;
-}
-
-.left {
-    padding: 20px;
-}
-
-.right {
-    float: right;
-    width: 25%;
-    padding: 20px;
 }
 
 h1 {
@@ -136,18 +220,6 @@ ul.post_list li a {
     text-decoration: none;
 }
 
-ul.menu {
-    margin: 0;
-    padding: 0;
-    list-style-type: none;
-}
-
-ul.menu li {
-    display: block;
-    padding: 15px;
-    width: auto;
-}
-
 ul.menu li a {
     display: block;
     color: #444;
@@ -163,10 +235,6 @@ ul.menu li a:hover {
 
 ul.menu li a span {
   vertical-align: middle;
-}
-
-ul.menu li a span.label {
-  font-size: 14pt;
 }
 
 span.navi-icon {

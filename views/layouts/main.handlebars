@@ -2,6 +2,7 @@
 <html>
   <head>
     <meta charset="utf8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{{siteTitle}}</title>
     <link rel="stylesheet" type="text/css" href="/css/screen.css" />
     <link href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet" />
@@ -12,19 +13,21 @@
         <a href="/" class="brand">{{siteTitle}}</a>
       </div>
     </header>
-    <div class="wrapper">
-      {{{body}}}
-    </div>
     <div class="right">
       <ul class="menu">
         <li><a href="/posts"><span class="fa fa-pencil navi-icon fa-4x"></span><span class="label">Posts &amp; Articles</span></a></li>
-        <!-- <li><a href="/course-notes"><span class="fa fa-file-pdf-o navi-icon fa-4x"></span><span class="label">Course Notes</span></a></li> -->
-        <li><a href="http://github.com/AnthonyCalandra"><span class="fa fa-github navi-icon fa-4x"></span><span class="label">Github</span></a></li>
+        <li><a href="http://github.com/AnthonyCalandra"><span class="fa fa-github navi-icon fa-4x"></span><span class="label">Github Profile</span></a></li>
+        <li><a href="http://stackoverflow.com/users/3229983/anthony-calandra"><span class="fa fa-stack-overflow navi-icon fa-4x"></span><span class="label">SO Profile</span></a></li>
         <li><a href="/downloads/AnthonyCalandra_Resume.pdf"><span class="fa fa-paperclip navi-icon fa-4x"></span><span class="label">Resume</span></a></li>
       </ul>
     </div>
+    <div class="wrapper">
+      <main>
+        {{{body}}}
+      </main>
+    </div>
     <footer>
-      <div>
+      <span>
         {{#if loggedIn}}
           <a href="/logout?_csrf={{csrfToken}}" class="brand">Logout</a> - <a href="/create" class="brand">Create Post</a>
           {{#if inPost}}
@@ -33,7 +36,8 @@
         {{else}}
           <a href="/login" class="brand">Login</a>
         {{/if}}
-         - <a href="/posts" class="brand">Posts Index</a></div>
+         - <a href="/posts" class="brand">Posts Index</a>
+      </span>
     </footer>
     {{{footerHtml}}}
   </body>
