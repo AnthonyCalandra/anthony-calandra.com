@@ -14,7 +14,10 @@ module.exports = function(app) {
           for (var postIndex in posts) {
             if (posts.hasOwnProperty(postIndex)) {
               var post = posts[postIndex];
-              if (cats.indexOf(post.getCategory()) === -1) {
+              // Skip drafted posts if we aren't logged in.
+              if (post.draft && !utils.isUserLoggedIn(req)) {
+                continue;
+              } else if (cats.indexOf(post.getCategory()) === -1) {
                 cats.push(post.getCategory());
               }
             }
@@ -28,11 +31,13 @@ module.exports = function(app) {
       // Order posts by category.
       categories.forEach(function(cat) {
         indexedPosts[cat] = posts.filter(function(post) {
-          return post.getCategory() === cat;
+          return post.getCategory() === cat && !(post.draft &&
+            !utils.isUserLoggedIn(req));
         }).map(function(post) {
           return {
             title: post.title,
             urlTitle: post.urlTitle,
+            draft: post.draft
           };
         });
       });
@@ -49,11 +54,19 @@ module.exports = function(app) {
     }).exec(function(err, post) {
       var context = {};
       if (post) {
+        if (post.draft && !utils.isUserLoggedIn(req)) {
+          res.render('error', {
+            error: 'The post doesn\'t exist!'
+          });
+          return;
+        }
+
         app.locals.postId = post._id;
         context = {
           title: post.title,
           content: post.parseMarkdown(),
           category: post.getCategory(),
+          draft: post.draft,
           tags: post.tags
         };
       } else {
@@ -101,6 +114,7 @@ module.exports = function(app) {
         title: req.body.title,
         content: req.body.content,
         tags: req.body.tags,
+        draft: req.body.draft,
         categories: config.categories.map(function(categoryName, index) {
           return {
             id: index,
@@ -142,7 +156,8 @@ module.exports = function(app) {
         title: req.body.title,
         content: req.body.content,
         categoryId: req.body.category,
-        tags: req.body.tags
+        tags: req.body.tags,
+        draft: req.body.draft
       }).save(function(err) {
         if (err) {
           console.log(err.stack);
@@ -180,7 +195,8 @@ module.exports = function(app) {
           title: post.title,
           content: post.content,
           category: post.getCategory(),
-          tags: post.tags.join(', ')
+          tags: post.tags.join(', '),
+          post: post.draft
         };
       } else {
         res.render('error', {
@@ -222,6 +238,7 @@ module.exports = function(app) {
         title: req.body.title,
         content: req.body.content,
         tags: req.body.tags,
+        draft: req.body.draft,
         categories: config.categories.map(function(categoryName, index) {
           return {
             id: index,
@@ -265,6 +282,7 @@ module.exports = function(app) {
           post.content = req.body.content;
           post.categoryId = req.body.category;
           post.tags = req.body.tags;
+          post.draft = req.body.draft;
           post.save(function(err) {
             if (err) {
               console.log(err.stack);

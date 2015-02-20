@@ -3,7 +3,11 @@
   <h1>{{@key}}</h1>
   <ul class="post_list">
     {{#each .}}
-      <li><a href="/posts/{{urlTitle}}">{{title}}</a></li>
+      {{#if draft}}
+        <li>[DRAFT] <a href="/posts/{{urlTitle}}">{{title}}</a></li>
+      {{else}}
+        <li><a href="/posts/{{urlTitle}}">{{title}}</a></li>
+      {{/if}}
     {{/each}}
   </ul>
   <br />
