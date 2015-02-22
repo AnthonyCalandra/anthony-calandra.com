@@ -196,7 +196,7 @@ module.exports = function(app) {
           content: post.content,
           category: post.getCategory(),
           tags: post.tags.join(', '),
-          post: post.draft
+          draft: post.draft
         };
       } else {
         res.render('error', {
