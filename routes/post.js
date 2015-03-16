@@ -83,6 +83,8 @@ module.exports = function(app) {
           '<script type="text/javascript" src="/js/' +
           script + '"></script>';
       });
+      app.locals.footerHtml += '<script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=AM_HTMLorMML"></script>';
+      app.locals.footerHtml += '<script type="text/javascript">MathJax.Hub.Config({asciimath2jax: {delimiters: [["$$", "$$"]]}});</script>';
       app.locals.footerHtml +=
         '<link href="/css/shCore.css" rel="stylesheet" type="text/css" /><link href="/css/shThemeDefault.css" rel="stylesheet" type="text/css" /><script type="text/javascript">SyntaxHighlighter.all();</script>';
       res.render('post', context);
