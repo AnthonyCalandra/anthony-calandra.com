@@ -50,19 +50,19 @@ postSchema.methods.getPreviewContent = function() {
 };
 
 postSchema.pre('save', function(next) {
-  var validator = require('validator'),
-    ent = require('ent'),
-    entOpts = {
-      named: true
-    },
-    post = this,
-    postId = post.id || 0;
+  var validator = require('validator');
+  var ent = require('ent');
+  var entOpts = {
+    named: true
+  };
+  var post = this;
+  var postId = post.id || 0;
 
   // The url title should only contain url-friendly chars.
   post.urlTitle = validator.whitelist(post.title, 'a-zA-Z0-9 ').replace(
     / /g, '-');
   mongoose.model('Post', postSchema).find({
-    urlTitle: new RegExp('^' + post.title + '(?:-\d+)?')
+    urlTitle: new RegExp('^' + post.urlTitle + '(?:-\d+)?')
   }).sort({
     'urlTitle': 'desc'
   }).exec(function(err, posts) {
