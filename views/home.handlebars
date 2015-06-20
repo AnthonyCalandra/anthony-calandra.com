@@ -22,19 +22,6 @@
         <span id="nav-label"></span>
       </main>
     </div>
-    <footer>
-      <span>
-        {{#if loggedIn}}
-          <a href="/logout?_csrf={{csrfToken}}" class="brand">Logout</a> - <a href="/create" class="brand">Create Post</a>
-          {{#if inPost}}
-          - <a href="/edit/{{postId}}" class="brand">Edit Post</a> - <a href="/delete/{{postId}}" class="brand">Delete Post</a>
-          {{/if}}
-        {{else}}
-          <a href="/login" class="brand">Login</a>
-        {{/if}}
-         - <a href="/posts" class="brand">Posts Index</a>
-      </span>
-    </footer>
     {{{footerHtml}}}
     <script style="text/javascript">
       document.getElementById('nav-list').addEventListener('mouseover', function(e) {
