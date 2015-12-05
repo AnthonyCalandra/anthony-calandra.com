@@ -1,5 +1,6 @@
 var config = require('./config.js');
 var express = require('express');
+var http = require('http');
 var https = require('https');
 var fs = require('fs');
 var expressHandlebars = require('express-handlebars');
@@ -31,7 +32,6 @@ app.engine('handlebars', expressHandlebars({
   defaultLayout: 'main'
 }));
 app.set('view engine', 'handlebars');
-app.set('port', process.env.PORT || 3000);
 app.use(function(req, res, next) {
   // Have the following available to every view/layout.
   res.locals.csrfToken = req.csrfToken();
@@ -59,8 +59,13 @@ app.use(function(err, req, res, next) {
   res.type('text/plain').status(500).send('500 - Internal Server Error');
 });
 
-https.createServer(serverOptions, app).listen(app.get('port'), function() {
+https.createServer(serverOptions, app).listen(443, function() {
   console.log('Express started in ' + app.get('env') +
-    ' mode on localhost:' + app.get('port'));
+    ' mode on localhost:443');
+  console.log('Press Ctrl-C to terminate.');
+});
+http.createServer(app).listen(80, function() {
+  console.log('Express started in ' + app.get('env') +
+    ' mode on localhost:80');
   console.log('Press Ctrl-C to terminate.');
 });
