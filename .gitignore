@@ -6,3 +6,4 @@ public/images
 nodemon
 dexterslab
 start-server
+errors.log
