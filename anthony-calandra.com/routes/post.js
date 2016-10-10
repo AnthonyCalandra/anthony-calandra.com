@@ -1,4 +1,4 @@
-var config = require('../config.js'),
+var config = require('../../config.js'),
   utils = require('../lib/utils.js'),
   Post = require('../models/post.js');
 

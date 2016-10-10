@@ -1,7 +1,5 @@
-var config = require('./config.js');
+var config = require('../config.js');
 var express = require('express');
-var http = require('http');
-var https = require('https');
 var fs = require('fs');
 var expressHandlebars = require('express-handlebars');
 var mongoose = require('mongoose');
@@ -10,10 +8,6 @@ var sessionStore = new MongoSessionStore({
   url: config.mongoConnStr
 });
 var app = express();
-var serverOptions = {
-  key: fs.readFileSync(config.key),
-  cert: fs.readFileSync(config.cert)
-};
 
 app.use(express.static(__dirname + '/public'));
 mongoose.connect(config.mongoConnStr, config.mongoOpts);
@@ -29,8 +23,10 @@ app.use(require('express-session')({
 }));
 app.use(require('csurf')());
 app.engine('handlebars', expressHandlebars({
+  layoutsDir: __dirname + '/views/layouts',
   defaultLayout: 'main'
 }));
+app.set('views', __dirname + '/views');
 app.set('view engine', 'handlebars');
 app.use(function(req, res, next) {
   // Have the following available to every view/layout.
@@ -59,13 +55,4 @@ app.use(function(err, req, res, next) {
   res.type('text/plain').status(500).send('500 - Internal Server Error');
 });
 
-https.createServer(serverOptions, app).listen(443, function() {
-  console.log('Express started in ' + app.get('env') +
-    ' mode on localhost:443');
-  console.log('Press Ctrl-C to terminate.');
-});
-http.createServer(app).listen(80, function() {
-  console.log('Express started in ' + app.get('env') +
-    ' mode on localhost:80');
-  console.log('Press Ctrl-C to terminate.');
-});
+exports.app = app;

@@ -21,7 +21,7 @@ postSchema.methods.parseMarkdown = function() {
 };
 
 postSchema.methods.getCategory = function() {
-  var config = require('../config.js');
+  var config = require('../../config.js');
   // Category sanitizartion...
   if (this.categoryId < 0 || this.categoryId >= config.categories.length) {
     this.categoryId = 0;
@@ -31,7 +31,7 @@ postSchema.methods.getCategory = function() {
 };
 
 postSchema.methods.getPreviewContent = function() {
-  var postPreviewLength = require('../config.js').postPreviewLength,
+  var postPreviewLength = require('../../config.js').postPreviewLength,
     HtmlStrip = require('htmlstrip-native');
 
   // Strip off HTML tags and decode HTML entities.

@@ -1,38 +1,26 @@
-var express = require('express'),
-  expressHandlebars = require('express-handlebars'),
-  app = express();
+var http = require('http');
+var https = require('https');
+var fs = require('fs');
+var config = require('./config.js');
+var vhost = require('vhost');
+var express = require('express');
+var anthonyCalandra = require('./anthony-calandra.com');
+var hockeyAnthonyCalandra = require('./hockey.anthony-calandra.com');
+var app = express()
+.use(function(req, res, next) {
+  // HTTPS redirection.
+  if (!req.secure) {
+    return res.redirect('https://' + req.headers.host + req.url);
+  }
 
-app.use(express.static(__dirname + '/public'));
-app.engine('handlebars', expressHandlebars({
-  defaultLayout: 'main'
-}));
-app.set('view engine', 'handlebars');
-app.set('port', process.env.PORT || 3000);
+  next();
+})
+.use(vhost('anthony-calandra.com', anthonyCalandra.app))
+.use(vhost('hockey.anthony-calandra.com', hockeyAnthonyCalandra.app));
 
-app.get('/', function(req, res) {
-  res.render('home');
-});
-
-app.get('/posts', function(req, res) {
-  res.render('posts-index');
-});
-
-// TODO: Simple blog software.
-app.get('/posts/:post', function(req, res) {
-  res.render(req.params.post);
-});
-
-app.use(function(req, res) {
-  res.type('text/plain').status(404).send('404 - Not Found');
-});
-
-app.use(function(err, req, res, next) {
-  console.log(err.stack);
-  res.type('text/plain').status(500).send('500 - Internal Server Error');
-});
-
-app.listen(app.get('port'), function() {
-  console.log('Express started in ' + app.get('env') +
-    ' mode on localhost:' + app.get('port'));
-  console.log('Press Ctrl-C to terminate.');
-});
+var sslOptions = {
+  key: fs.readFileSync(config.key),
+  cert: fs.readFileSync(config.cert)
+};
+http.createServer(app).listen(80);
+https.createServer(sslOptions, app).listen(443);
