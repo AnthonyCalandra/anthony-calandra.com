@@ -2,8 +2,8 @@ config.js
 node_modules
 .DS_Store
 anthony-calandra.com/public/downloads
-anthony-calandra.com/public/js/build
 anthony-calandra.com/public/images
+hockey.anthony-calandra.com/public/js/build
 start-server
 errors.log
 .well-known
