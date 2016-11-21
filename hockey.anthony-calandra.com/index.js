@@ -2,24 +2,19 @@ var express = require('express'),
   expressHandlebars = require('express-handlebars'),
   app = express();
 
-//app.use(express.static(__dirname + '/public'));
+app.use(express.static(__dirname + '/public'));
 app.engine('handlebars', expressHandlebars({
   defaultLayout: 'main'
 }));
+app.set('views', __dirname + '/views');
 app.set('view engine', 'handlebars');
-app.set('port', process.env.PORT || 3000);
 
-/*app.get('/', function(req, res) {
-  res.render('home');
+app.get('/', function(req, res) {
+  res.locals.siteTitle = "hockey.anthony-calandra.com";
+  res.render('home', {
+    layout: false
+  });
 });
-
-app.get('/posts', function(req, res) {
-  res.render('posts-index');
-});
-
-app.get('/posts/:post', function(req, res) {
-  res.render(req.params.post);
-});*/
 
 app.use(function(req, res) {
   res.type('text/plain').status(404).send('404 - Not Found');

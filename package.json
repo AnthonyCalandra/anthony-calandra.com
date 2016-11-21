@@ -1,19 +1,22 @@
 {
-  "name": "NodeBlog",
-  "version": "0.1.0",
-  "description": "A simple blog engine for Node using Express.",
-  "main": "node-blog.js",
-  "keywords": [
-    "node",
-    "blog",
-    "express",
-    "simple",
-    "small",
-    "library",
-    "lib"
-  ],
+  "name": "anthony-calandra.com",
+  "version": "1.0.0",
+  "description": "My personal website.",
+  "main": "index.js",
   "author": "Anthony Calandra <anthony@anthony-calandra.com>",
   "license": "MIT",
+  "scripts": {
+    "production": "npm build && NODE_ENV='production' /usr/local/bin/forever -e errors.log start index.js",
+    "dev": "PORT=3000 NODE_ENV='development' nodemon index.js",
+    "client-dev": "webpack --progress --colors --watch",
+    "build": "webpack"
+  },
+  "babel": {
+    "presets": [
+      "es2015",
+      "react"
+    ]
+  },
   "dependencies": {
     "body-parser": "^1.10.0",
     "connect": "^2.27.6",
@@ -27,8 +30,18 @@
     "marked": "^0.3.2",
     "mongoose": "3.8.21",
     "node-syntaxhighlighter": "^0.8.1",
+    "react": "^15.4.0",
+    "react-dom": "^15.4.0",
     "session-mongoose": "^0.5.2",
     "validator": "^3.27.0",
     "vhost": "^3.0.2"
+  },
+  "devDependencies": {
+    "babel-core": "^6.18.2",
+    "babel-loader": "^6.2.8",
+    "babel-polyfill": "^6.16.0",
+    "babel-preset-es2015": "^6.18.0",
+    "babel-preset-react": "^6.16.0",
+    "webpack": "^1.13.3"
   }
 }

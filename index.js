@@ -6,21 +6,28 @@ var vhost = require('vhost');
 var express = require('express');
 var anthonyCalandra = require('./anthony-calandra.com');
 var hockeyAnthonyCalandra = require('./hockey.anthony-calandra.com');
-var app = express()
-.use(function(req, res, next) {
-  // HTTPS redirection.
-  if (!req.secure) {
-    return res.redirect('https://' + req.headers.host + req.url);
-  }
+var isProduction = process.env.NODE_ENV === 'production';
+var app = express();
+if (isProduction) {
+  app.use(function(req, res, next) {
+    // HTTPS redirection.
+    if (!req.secure) {
+      return res.redirect('https://' + req.headers.host + req.url);
+    }
 
-  next();
-})
-.use(vhost('anthony-calandra.com', anthonyCalandra.app))
-.use(vhost('hockey.anthony-calandra.com', hockeyAnthonyCalandra.app));
+    next();
+  })
+  .use(vhost('anthony-calandra.com', anthonyCalandra.app))
+  .use(vhost('hockey.anthony-calandra.com', hockeyAnthonyCalandra.app));
+} else {
+  app.use(vhost('localhost', hockeyAnthonyCalandra.app));
+}
 
-var sslOptions = {
-  key: fs.readFileSync(config.key),
-  cert: fs.readFileSync(config.cert)
-};
-http.createServer(app).listen(80);
-https.createServer(sslOptions, app).listen(443);
+http.createServer(app).listen(process.env.PORT || 80);
+if (isProduction) {
+  var sslOptions = {
+    key: fs.readFileSync(config.key),
+    cert: fs.readFileSync(config.cert)
+  };
+  https.createServer(sslOptions, app).listen(443);
+}
