@@ -6,7 +6,7 @@
   "author": "Anthony Calandra <anthony@anthony-calandra.com>",
   "license": "MIT",
   "scripts": {
-    "production": "npm build && NODE_ENV='production' /usr/local/bin/forever -e errors.log start index.js",
+    "production": "npm run build && NODE_ENV='production' /usr/local/bin/forever -e errors.log start index.js",
     "dev": "PORT=3000 NODE_ENV='development' nodemon index.js",
     "client-dev": "webpack --progress --colors --watch",
     "build": "webpack"
