@@ -3,7 +3,7 @@ var config = require('../../config.js'),
   Post = require('../models/post.js');
 
 module.exports = function(app) {
-  app.get('/posts', function(req, res) {
+  app.get('/posts', utils.loggedIn(true), function(req, res) {
     // Get all posts and order them by date in descending order.
     Post.find().sort({
       'date': 'desc'

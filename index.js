@@ -20,7 +20,7 @@ if (isProduction) {
   .use(vhost('anthony-calandra.com', anthonyCalandra.app))
   .use(vhost('hockey.anthony-calandra.com', hockeyAnthonyCalandra.app));
 } else {
-  app.use(vhost('localhost', hockeyAnthonyCalandra.app));
+  app.use(vhost('anthony-calandra.com', anthonyCalandra.app));
 }
 
 http.createServer(app).listen(process.env.PORT || 80);
