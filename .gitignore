@@ -1,6 +1,7 @@
 config.js
 node_modules
 .DS_Store
+anthony-calandra.com/public/*.pdf
 anthony-calandra.com/public/downloads
 anthony-calandra.com/public/images
 hockey.anthony-calandra.com/public/js/build
