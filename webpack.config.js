@@ -2,9 +2,9 @@ var path = require('path');
 var webpack = require('webpack');
 
 module.exports = {
-  entry: './hockey.anthony-calandra.com/client/index.jsx',
+  entry: './dexters-lab.anthony-calandra.com/client/index.jsx',
   output: {
-    path: path.join(__dirname, 'hockey.anthony-calandra.com/public/js/build'),
+    path: path.join(__dirname, 'dexters-lab.anthony-calandra.com/public/js/build'),
     filename: 'bundle.js'
   },
   module: {
@@ -12,7 +12,7 @@ module.exports = {
       {
         loader: ['babel'],
         test: /\.jsx?$/,
-        include: path.join(__dirname, 'hockey.anthony-calandra.com/client'),
+        include: path.join(__dirname, 'dexters-lab.anthony-calandra.com/client'),
         exclude: /node_modules/,
         query: {
           presets: ['es2015', 'react'],

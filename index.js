@@ -5,7 +5,7 @@ var config = require('./config.js');
 var vhost = require('vhost');
 var express = require('express');
 var anthonyCalandra = require('./anthony-calandra.com');
-var hockeyAnthonyCalandra = require('./hockey.anthony-calandra.com');
+var dexterslabAnthonyCalandra = require('./dexters-lab.anthony-calandra.com');
 var isProduction = process.env.NODE_ENV === 'production';
 var app = express();
 if (isProduction) {
@@ -18,7 +18,7 @@ if (isProduction) {
     next();
   })
   .use(vhost('anthony-calandra.com', anthonyCalandra.app))
-  .use(vhost('hockey.anthony-calandra.com', hockeyAnthonyCalandra.app));
+  .use(vhost('dexters-lab.anthony-calandra.com', dexterslabAnthonyCalandra.app));
 } else {
   app.use(vhost('anthony-calandra.com', anthonyCalandra.app));
 }

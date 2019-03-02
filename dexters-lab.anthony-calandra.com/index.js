@@ -10,7 +10,7 @@ app.set('views', __dirname + '/views');
 app.set('view engine', 'handlebars');
 
 app.get('/', function(req, res) {
-  res.locals.siteTitle = "hockey.anthony-calandra.com";
+  res.locals.siteTitle = "dexters-lab.anthony-calandra.com";
   res.render('home', {
     layout: false
   });
