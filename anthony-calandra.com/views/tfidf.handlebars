@@ -1,0 +1,28 @@
+<!doctype html>
+<html>
+<head>
+    <title>wikipedia-tfidf</title>
+    <style>
+        body {
+            font-family: Arial;
+        }
+
+        #query {
+            width: 50%;
+            font-size: 30px;
+        }
+    </style>
+</head>
+<body>
+    <h1>wikipedia-tfidf</h1>
+    <div id="form">
+        <input type="text" id="query" value="big data AND" /><br />
+        <input type="hidden" id="_csrf" value="{{csrfToken}}" />
+        <input type="button" id="submit" value="Submit" />
+        <p><em>Note: Results may not be completely accurate with latest Wikipedia articles. This dataset is a snapshot from October 2013.</em></p>
+    </div>
+    <hr />
+    <pre id="results"></pre>
+    <script type="text/javascript" src="/js/tfidf.js"></script>
+</body>
+</html>

@@ -14,6 +14,7 @@ mongoose.connect(config.mongoConnStr, config.mongoOpts);
 app.use(require('body-parser').urlencoded({
   extended: true
 }));
+app.use(require('body-parser').json());
 app.use(require('cookie-parser')(config.cookieSecret));
 app.use(require('express-session')({
   store: sessionStore,
@@ -45,6 +46,7 @@ app.use(function(req, res, next) {
 require('./routes/index.js')(app);
 require('./routes/post.js')(app);
 require('./routes/login-logout.js')(app);
+require('./routes/tfidf.js')(app);
 
 app.use(function(req, res) {
   res.type('text/plain').status(404).send('404 - Not Found');
