@@ -1,9 +1,7 @@
 @media screen and (max-width: 600px) {
-  .right {
-      width: 100%;
-  }
-
   .wrapper {
+    margin: 0 auto;
+    padding: 15px 0 15px 0;
     min-height: 100%;
     width: 100%;
     background: #fff;
@@ -26,24 +24,21 @@
     display: inline-block;
     padding: 10px;
   }
+
+  article code {
+    font-size: 10pt;
+  }
 }
 
 @media all and (min-width: 600px) {
-  .clear {
-      clear: both;
-  }
-
-  .right {
-      float: right;
-      width: 25%;
-  }
-
   .wrapper {
-    float: left;
+    margin: 0 auto;
+    padding: 15px;
     min-height: 100%;
     width: 70%;
     background: #fff;
     box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    border-left: 1px solid #d0d0d0;
     border-right: 1px solid #d0d0d0;
   }
 
@@ -58,17 +53,10 @@
   }
 
   ul.menu li {
-    display: block;
+    display: inline;
     padding: 15px;
     width: auto;
   }
-}
-
-@font-face {
-  font-family: 'Open Sans';
-  font-style: normal;
-  font-weight: 400;
-  src: local('Open Sans'), local('OpenSans'), url(//fonts.gstatic.com/s/opensans/v10/cJZKeOuBrn4kERxqtaUH3bO3LdcAZYWl9Si6vvxL-qU.woff) format('woff');
 }
 
 * {
@@ -77,7 +65,7 @@
 }
 
 html, body {
-    font-family: 'Open Sans', sans-serif;
+    font-family: 'Merriweather', 'Open Sans', sans-serif;
     color: #565668;
     height: 100%;
 }
@@ -90,6 +78,16 @@ header {
   border-bottom: 3px solid #3d84fe;
 }
 
+.clear {
+    clear: both;
+}
+
+.center-text {
+    text-align: center;
+}
+
+/* Home styling START. */
+
 #home-panel {
   text-align: center;
   min-height: 100%;
@@ -101,6 +99,8 @@ header {
 
 #home-panel h1 {
   font-size: 50pt;
+  color: black;
+  font-weight: 400;
 }
 
 #home-panel nav ul {
@@ -112,6 +112,17 @@ header {
   padding: 10px;
 }
 
+#home-panel ul li a {
+  text-align: center;
+  margin: auto;
+}
+
+#home-panel nav ul {
+  font-size: 13px;
+  line-height: 20px;
+  padding: 5px 5px 5px 25px;
+}
+
 #nav-label {
   font-weight: bold;
   padding-right: 15px;
@@ -119,10 +130,8 @@ header {
   transition: opacity 1s;
 }
 
-#home-panel ul li a {
-  text-align: center;
-  margin: auto;
-}
+/* Home styling END. */
+/* Footer styling START. */
 
 footer {
   clear: both;
@@ -139,10 +148,6 @@ footer span {
   top: 40%;
 }
 
-.wrapper main {
-  padding: 0px 10px 0px 10px;
-}
-
 .branding {
     height: 75px;
     width: 100%;
@@ -157,53 +162,28 @@ a.brand {
     text-decoration: none;
 }
 
-h1 {
-    font-size: 18px;
+/* Footer styling END. */
+
+main {
+  padding: 15px 10px 15px 10px;
+}
+
+article h1 {
+    font-size: 36px;
     margin: 0;
     color: #000;
 }
 
-.home h1 {
-  font-size: 60px;
-  text-align: center;
-}
-
-.home p {
-  font-size: 21px;
-  text-align: center;
-}
-
-.home .pic {
-  display: block;
-  margin: 50px 0px 50px 0px;
-  text-align: center;
+article ul, article ol {
+  font-size: 18px;
+  padding: 0 25px 10px 25px;
+  line-height: 1.5;
 }
 
 p {
-    text-align: justify;
-    font-size: 13px;
-    line-height: 20px;
+    font-size: 18px;
+    line-height: 1.5;
     padding: 10px;
-}
-
-h1:not(.no-underline), h2:not(.no-underline), h3:not(.no-underline) {
-    border-bottom: 3px solid #3d84fe;
-    padding-bottom: 10px;
-}
-
-h1.navigation {
-    border-bottom: 3px solid #555;
-    padding-bottom: 10px;
-}
-
-ul, ol {
-    font-size: 13px;
-    line-height: 20px;
-    padding: 5px 5px 5px 25px;
-}
-
-.content ul, .content ol {
-    padding-left: 30px;
 }
 
 ul.post_list {
@@ -221,7 +201,6 @@ ul.post_list li a {
 }
 
 ul.menu li a {
-    display: block;
     color: #444;
     text-decoration: none;
     text-transform: uppercase;

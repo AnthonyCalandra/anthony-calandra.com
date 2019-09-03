@@ -1,16 +1,14 @@
-{{#each posts}}
-  <br />
-  <h1>{{@key}}</h1>
+<h1>Articles</h1>
+{{#if hasPosts}}
   <ul class="post_list">
-    {{#each .}}
+    {{#each posts}}
       {{#if draft}}
-        <li>[DRAFT] <a href="/posts/{{urlTitle}}">{{title}}</a></li>
+        <li>[DRAFT] <a href="/blog/view/{{urlTitle}}">{{title}}</a></li>
       {{else}}
-        <li><a href="/posts/{{urlTitle}}">{{title}}</a></li>
+        <li>{{date}} <a href="/blog/view/{{urlTitle}}">{{title}}</a></li>
       {{/if}}
     {{/each}}
   </ul>
-  <br />
 {{else}}
   <p>No posts to display.</p>
-{{/each}}
+{{/if}}

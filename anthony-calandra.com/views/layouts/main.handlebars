@@ -6,22 +6,18 @@
     <title>{{siteTitle}}</title>
     <link rel="stylesheet" type="text/css" href="/css/screen.css" />
     <link href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet" />
+    <link href="//fonts.googleapis.com/css?family=Merriweather:900,900italic,300,300italic" rel="stylesheet" type="text/css">
   </head>
   <body>
-    <header>
-      <div class="branding">
-        <a href="/" class="brand">{{siteTitle}}</a>
-      </div>
-    </header>
-    <div class="right">
-      <ul class="menu">
-        <li><a href="/posts"><span class="fa fa-pencil navi-icon fa-4x"></span><span class="label">Posts &amp; Articles</span></a></li>
-        <li><a href="http://github.com/AnthonyCalandra"><span class="fa fa-github navi-icon fa-4x"></span><span class="label">Github Profile</span></a></li>
-        <li><a href="http://stackoverflow.com/users/3229983/anthony-calandra"><span class="fa fa-stack-overflow navi-icon fa-4x"></span><span class="label">SO Profile</span></a></li>
-        <li><a href="/downloads/AnthonyCalandra_Resume.pdf"><span class="fa fa-paperclip navi-icon fa-4x"></span><span class="label">Resume</span></a></li>
-      </ul>
-    </div>
     <div class="wrapper">
+      <div id="nav-menu" class="center-text">
+        <ul class="menu">
+          <li><a href="/blog"><span class="fa fa-pencil navi-icon fa-4x"></span></a></li>
+          <li><a href="http://github.com/AnthonyCalandra"><span class="fa fa-github navi-icon fa-4x"></span></a></li>
+          <li><a href="http://stackoverflow.com/users/3229983/anthony-calandra"><span class="fa fa-stack-overflow navi-icon fa-4x"></span></a></li>
+          <li><a href="/downloads/AnthonyCalandra_Resume.pdf"><span class="fa fa-paperclip navi-icon fa-4x"></span></a></li>
+        </ul>
+      </div>
       <main>
         {{{body}}}
       </main>
@@ -29,14 +25,14 @@
     <footer>
       <span>
         {{#if loggedIn}}
-          <a href="/logout?_csrf={{csrfToken}}" class="brand">Logout</a> - <a href="/create" class="brand">Create Post</a>
+          <a href="/logout?_csrf={{csrfToken}}" class="brand">Logout</a> - <a href="/blog/create" class="brand">Create Post</a>
           {{#if inPost}}
-          - <a href="/edit/{{postId}}" class="brand">Edit Post</a> - <a href="/delete/{{postId}}" class="brand">Delete Post</a>
+          - <a href="/blog/edit/{{postId}}" class="brand">Edit Post</a> - <a href="/blog/delete/{{postId}}" class="brand">Delete Post</a>
           {{/if}}
         {{else}}
           <a href="/login" class="brand">Login</a>
         {{/if}}
-         - <a href="/posts" class="brand">Posts Index</a>
+         - <a href="/blog" class="brand">Blog Index</a>
       </span>
     </footer>
     {{{footerHtml}}}

@@ -1,14 +1,9 @@
-<br />
 <article>
   {{#if draft}}
-    <h3>[DRAFT] {{title}}</h3>
+    <h1 class="center-text">[DRAFT] {{title}}</h1>
   {{else}}
-    <h3>{{title}}</h3>
+    <h1 class="center-text">{{title}}</h1>
   {{/if}}
-  <p>{{{content}}}</p>
-  <div>Posted in: {{category}}</div>
-  Tags:
-  {{#each tags}}
-    {{.}},
-  {{/each}}
+  {{{content}}}
+  Tags: {{tags}}
 </article>

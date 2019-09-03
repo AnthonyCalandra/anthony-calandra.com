@@ -3,51 +3,31 @@ var config = require('../../config.js'),
   Post = require('../models/post.js');
 
 module.exports = function(app) {
-  app.get('/posts', utils.loggedIn(true), function(req, res) {
+  app.get('/blog', function(req, res) {
     // Get all posts and order them by date in descending order.
     Post.find().sort({
       'date': 'desc'
-    }).exec(function(err, posts) {
-      // Get all categories (no duplicates).
-      var categories = (function() {
-          var cats = [];
-          for (var postIndex in posts) {
-            if (posts.hasOwnProperty(postIndex)) {
-              var post = posts[postIndex];
-              // Skip drafted posts if we aren't logged in.
-              if (post.draft && !utils.isUserLoggedIn(req)) {
-                continue;
-              } else if (cats.indexOf(post.getCategory()) === -1) {
-                cats.push(post.getCategory());
-              }
-            }
-          }
-
-          return cats;
-        })(),
-        indexedPosts = {},
-        context = {};
-
-      // Order posts by category.
-      categories.forEach(function(cat) {
-        indexedPosts[cat] = posts.filter(function(post) {
-          return post.getCategory() === cat && !(post.draft &&
-            !utils.isUserLoggedIn(req));
-        }).map(function(post) {
+    }).exec((err, posts) => {
+      const monthNames = [
+        'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September',
+        'October', 'November', 'December'
+      ];
+      posts = posts
+        .filter(post => !(post.draft && !utils.isUserLoggedIn(req)))
+        .map(post => {
+          const postDate = new Date(post.date);
           return {
             title: post.title,
             urlTitle: post.urlTitle,
-            draft: post.draft
+            draft: post.draft,
+            date: `${monthNames[postDate.getMonth()]} ${postDate.getDay()} ${postDate.getFullYear()}`
           };
         });
-      });
-      context.posts = indexedPosts;
-      context.categories = categories;
-      res.render('posts-index', context);
+      res.render('posts-index', { posts, hasPosts: posts.length > 0 });
     });
   });
 
-  app.get('/posts/:post', function(req, res) {
+  app.get('/blog/view/:post', function(req, res) {
     // Get the post with the given url title.
     Post.findOne({
       urlTitle: req.params.post
@@ -67,7 +47,7 @@ module.exports = function(app) {
           content: post.parseMarkdown(),
           category: post.getCategory(),
           draft: post.draft,
-          tags: post.tags
+          tags: post.tags.join(', ')
         };
       } else {
         res.render('error', {
@@ -91,7 +71,7 @@ module.exports = function(app) {
     });
   });
 
-  app.get('/create', utils.loggedIn(true), function(req, res) {
+  app.get('/blog/create', utils.loggedIn(true), function(req, res) {
     var context = {
       categories: config.categories.map(function(categoryName, index) {
         return {
@@ -104,7 +84,7 @@ module.exports = function(app) {
     res.render('create-post', context);
   });
 
-  app.post('/create', utils.loggedIn(true), function(req, res) {
+  app.post('/blog/create', utils.loggedIn(true), function(req, res) {
     req.body.category = parseInt(req.body.category, 10);
     // Sanitize the category id.
     if (req.body.category === NaN || req.body.category < 0 || req.body.category >=
@@ -168,7 +148,7 @@ module.exports = function(app) {
           });
           return;
         } else {
-          res.redirect(303, '/posts');
+          res.redirect(303, '/blog');
         }
       });
     } else {
@@ -176,7 +156,7 @@ module.exports = function(app) {
     }
   });
 
-  app.get('/edit/:id', utils.loggedIn(true), function(req, res) {
+  app.get('/blog/edit/:id', utils.loggedIn(true), function(req, res) {
     if (!req.params.id) {
       res.render('error', {
         error: 'No post ID given.'
@@ -220,7 +200,7 @@ module.exports = function(app) {
     });
   });
 
-  app.post('/edit/:id', utils.loggedIn(true), function(req, res) {
+  app.post('/blog/edit/:id', utils.loggedIn(true), function(req, res) {
     if (!req.params.id) {
       res.render('error', {
         error: 'No post ID given.'
@@ -293,7 +273,7 @@ module.exports = function(app) {
               });
               return;
             } else {
-              res.redirect(303, '/posts');
+              res.redirect(303, '/blog');
             }
           });
         } else {
@@ -308,7 +288,7 @@ module.exports = function(app) {
     }
   });
 
-  app.get('/delete/:id', utils.loggedIn(true), function(req, res) {
+  app.get('/blog/delete/:id', utils.loggedIn(true), function(req, res) {
     if (!req.params.id) {
       res.render('error', {
         error: 'No post ID given.'
@@ -339,7 +319,7 @@ module.exports = function(app) {
     });
   });
 
-  app.post('/delete/:id', utils.loggedIn(true), function(req, res) {
+  app.post('/blog/delete/:id', utils.loggedIn(true), function(req, res) {
     if (!req.params.id) {
       res.render('error', {
         error: 'No post ID given.'
@@ -358,7 +338,7 @@ module.exports = function(app) {
           });
           return;
         } else {
-          res.redirect(303, '/posts');
+          res.redirect(303, '/blog');
         }
       } else {
         res.render('error', {
