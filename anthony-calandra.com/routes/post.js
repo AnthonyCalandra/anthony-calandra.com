@@ -20,7 +20,7 @@ module.exports = function(app) {
             title: post.title,
             urlTitle: post.urlTitle,
             draft: post.draft,
-            date: `${monthNames[postDate.getMonth()]} ${postDate.getDay()} ${postDate.getFullYear()}`
+            date: `${monthNames[postDate.getMonth()]} ${postDate.getDate()} ${postDate.getFullYear()}`
           };
         });
       res.render('posts-index', { posts, hasPosts: posts.length > 0 });
