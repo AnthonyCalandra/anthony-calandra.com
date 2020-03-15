@@ -1,0 +1,12 @@
+[Unit]
+Description=Node blog service
+After=network.target mongod.service
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+ExecStart=/usr/local/bin/npm run --prefix /var/www/node/node-blog systemd-start
+
+[Install]
+WantedBy=multi-user.target
