@@ -3,9 +3,11 @@ var express = require('express');
 var fs = require('fs');
 var expressHandlebars = require('express-handlebars');
 var mongoose = require('mongoose');
-var MongoSessionStore = require('session-mongoose')(require('connect'));
-var sessionStore = new MongoSessionStore({
-  url: config.mongoConnStr
+var session = require('express-session');
+var MongoDBStore = require('connect-mongodb-session')(session);
+var sessionStore = new MongoDBStore({
+  uri: config.mongoConnStr,
+  collection: 'sessions'
 });
 var app = express();
 

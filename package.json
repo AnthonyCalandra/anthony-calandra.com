@@ -6,43 +6,27 @@
   "author": "Anthony Calandra <anthony@anthony-calandra.com>",
   "license": "MIT",
   "scripts": {
-    "systemd-start": "npm run build && NODE_ENV='production' node index.js",
-    "production": "npm run build && NODE_ENV='production' /usr/local/bin/forever -e errors.log start index.js",
-    "dev": "PORT=3000 NODE_ENV='development' nodemon index.js",
-    "client-dev": "webpack --progress --colors --watch",
-    "build": "webpack"
-  },
-  "babel": {
-    "presets": [
-      "es2015",
-      "react"
-    ]
+    "systemd-start": "NODE_ENV='production' node index.js",
+    "production": "NODE_ENV='production' /usr/local/bin/forever -e errors.log start index.js",
+    "dev": "PORT=3000 NODE_ENV='development' nodemon index.js"
   },
   "dependencies": {
     "body-parser": "^1.10.0",
-    "connect": "^2.27.6",
+    "connect": "^3.7.0",
+    "connect-mongodb-session": "^2.3.1",
     "cookie-parser": "^1.3.3",
     "csurf": "^1.6.4",
     "ent": "^2.0.0",
     "express": "^4.10.6",
-    "express-handlebars": "^1.1.0",
+    "express-handlebars": "^3.1.0",
     "express-session": "^1.9.3",
-    "htmlstrip-native": "^0.1.3",
-    "marked": "^0.3.2",
-    "mongoose": "~4.4",
+    "htmlstrip-native": "^0.3.0",
+    "marked": "^0.8.0",
+    "mongoose": "^5.7.5",
     "node-syntaxhighlighter": "^0.8.1",
-    "react": "^15.4.0",
-    "react-dom": "^15.4.0",
-    "session-mongoose": "^0.5.2",
-    "validator": "^3.27.0",
+    "react": "^16.13.0",
+    "react-dom": "^16.13.0",
+    "validator": "^12.2.0",
     "vhost": "^3.0.2"
-  },
-  "devDependencies": {
-    "babel-core": "^6.18.2",
-    "babel-loader": "^6.2.8",
-    "babel-polyfill": "^6.16.0",
-    "babel-preset-es2015": "^6.18.0",
-    "babel-preset-react": "^6.16.0",
-    "webpack": "^1.13.3"
   }
 }
