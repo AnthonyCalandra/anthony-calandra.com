@@ -6,7 +6,8 @@ After=network.target mongod.service
 Type=simple
 Restart=always
 RestartSec=1
-ExecStart=/usr/local/bin/npm run --prefix /var/www/node/node-blog systemd-start
+Environment=NODE_VERSION=14
+ExecStart=/root/.nvm/nvm-exec npm run --prefix /var/www/node/node-blog systemd-start
 
 [Install]
 WantedBy=multi-user.target
