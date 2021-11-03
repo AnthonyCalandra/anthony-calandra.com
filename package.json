@@ -26,7 +26,7 @@
     "node-syntaxhighlighter": "^0.8.1",
     "react": "^16.13.0",
     "react-dom": "^16.13.0",
-    "validator": "^12.2.0",
+    "validator": "^13.7.0",
     "vhost": "^3.0.2"
   }
 }
