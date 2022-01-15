@@ -21,7 +21,7 @@
     "express-handlebars": "^3.1.0",
     "express-session": "^1.9.3",
     "htmlstrip-native": "^0.3.0",
-    "marked": "^0.8.0",
+    "marked": "^4.0.10",
     "mongoose": "^5.7.5",
     "node-syntaxhighlighter": "^0.8.1",
     "react": "^16.13.0",
